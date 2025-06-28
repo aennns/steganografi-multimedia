@@ -9,3 +9,5 @@ click==8.1.7
 itsdangerous==2.1.2
 cffi==1.15.1
 pycparser==2.21
+gunicorn
+ opencv-python

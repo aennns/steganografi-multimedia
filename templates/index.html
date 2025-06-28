@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganografi Python - Spread Spectrum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tech-stack {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+
+        .mode-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #e9ecef;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-upload {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .file-upload:hover {
+            border-color: #764ba2;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+
+        .file-upload.dragover {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .file-upload input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .range-input {
+            flex: 1;
+        }
+
+        .range-value {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .preview-box {
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-box h4 {
+            margin: 15px 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .result-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 1px solid #28a745;
+        }
+
+        .result-error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: 1px solid #dc3545;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 6px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .message-display {
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .mode-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+
+            .tech-stack {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Steganografi Python</h1>
+            <p>Sembunyikan pesan rahasia dalam gambar menggunakan algoritma Spread Spectrum</p>
+            <div class="tech-stack">
+                <div class="tech-badge">🐍 Python</div>
+                <div class="tech-badge">🌊 Flask</div>
+                <div class="tech-badge">🔢 NumPy</div>
+                <div class="tech-badge">🖼️ PIL</div>
+                <div class="tech-badge">🔐 Cryptography</div>
+                <div class="tech-badge">📡 Spread Spectrum</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('encode')" id="encode-btn">
+                    <span>📝</span> Sembunyikan Pesan
+                </button>
+                <button class="mode-btn" onclick="setMode('decode')" id="decode-btn">
+                    <span>🔍</span> Ekstrak Pesan
+                </button>
+            </div>
+
+            <!-- Mode Encoding -->
+            <div id="encode-mode">
+                <form id="encodeForm" enctype="multipart/form-data">
+                    <div class="section">
+                        <h3><span>🖼️</span> Upload Gambar Cover</h3>
+                        <div class="file-upload" id="imageUpload">
+                            <input type="file" name="image" id="imageInput" accept="image/*" required>
+                            <div class="upload-icon">📁</div>
+                            <h4>Drag & Drop atau Klik untuk memilih gambar</h4>
+                            <p>Format: JPG, PNG, BMP (Maksimal 16MB)</p>
+                        </div>
+                        <div id="imagePreview" class="hidden">
+                            <img id="originalImage" alt="Original Image">
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><span>💬</span> Pesan Rahasia</h3>
+                        <div class="form-group">
+                            <label for="message">Masukkan pesan yang akan disembunyikan:</label>
+                            <textarea name="message" id="message" class="form-control" rows="4" 
+                                    placeholder="Ketik pesan rahasia Anda di sini..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password (opsional):</label>
+                            <input type="password" name="password" id="password" class="form-control" 
+                                   placeholder="Password untuk enkripsi tambahan">
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><span>⚙️</span> Pengaturan Spread Spectrum</h3>
+                        <div class="form-group">
+                            <label for="spreadFactor">Spread Factor:</label>
+                            <div class="range-container">
+                                <input type="range" name="spread_factor" id="spreadFactor" min="1" max="10" value="3" class="form-control range-input">
+                                <div class="range-value" id="spreadValue">3</div>
+                            </div>
+                            <small>Semakin tinggi = lebih aman tapi membutuhkan gambar yang lebih besar</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="encodeBtn">
+                        <span>🔒</span> Sembunyikan Pesan
+                    </button>
+                </form>
+
+                <div class="progress-bar hidden" id="encodeProgress">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Mode Decoding -->
+            <div id="decode-mode" class="hidden">
+                <form id="decodeForm" enctype="multipart/form-data">
+                    <div class="section">
+                        <h3><span>🖼️</span> Upload Gambar Steganografi</h3>
+                        <div class="file-upload" id="stegoUpload">
+                            <input type="file" name="image" id="stegoInput" accept="image/*" required>
+                            <div class="upload-icon">📁</div>
+                            <h4>Drag & Drop atau Klik untuk memilih gambar</h4>
+                            <p>Pilih gambar yang mengandung pesan tersembunyi</p>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><span>🔑</span> Pengaturan Dekripsi</h3>
+                        <div class="form-group">
+                            <label for="decodePassword">Password (jika ada):</label>
+                            <input type="password" name="password" id="decodePassword" class="form-control" 
+                                   placeholder="Masukkan password jika pesan dienkripsi">
+                        </div>
+                        <div class="form-group">
+                            <label for="decodeSpreadFactor">Spread Factor:</label>
+                            <div class="range-container">
+                                <input type="range" name="spread_factor" id="decodeSpreadFactor" min="1" max="10" value="3" class="form-control range-input">
+                                <div class="range-value" id="decodeSpreadValue">3</div>
+                            </div>
+                            <small>Harus sama dengan yang digunakan saat encoding</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="decodeBtn">
+                        <span>🔓</span> Ekstrak Pesan
+                    </button>
+                </form>
+
+                <div class="progress-bar hidden" id="decodeProgress">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section hidden" id="resultSection">
+                <h3 id="resultTitle">Hasil Operasi</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'encode';
+
+        // Mode switching
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('encode-mode').classList.toggle('hidden', mode !== 'encode');
+            document.getElementById('decode-mode').classList.toggle('hidden', mode !== 'decode');
+            document.getElementById('encode-btn').classList.toggle('active', mode === 'encode');
+            document.getElementById('decode-btn').classList.toggle('active', mode === 'decode');
+            
+            // Hide results when switching modes
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        // Range input handlers
+        document.getElementById('spreadFactor').addEventListener('input', function(e) {
+            document.getElementById('spreadValue').textContent = e.target.value;
+        });
+
+        document.getElementById('decodeSpreadFactor').addEventListener('input', function(e) {
+            document.getElementById('decodeSpreadValue').textContent = e.target.value;
+        });
+
+        // File upload handlers
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            handleImagePreview(e, 'originalImage', 'imagePreview');
+        });
+
+        // Drag and drop functionality
+        function setupDragDrop(uploadElement, inputElement) {
+            uploadElement.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadElement.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    inputElement.files = files;
+                    inputElement.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        setupDragDrop(document.getElementById('imageUpload'), document.getElementById('imageInput'));
+        setupDragDrop(document.getElementById('stegoUpload'), document.getElementById('stegoInput'));
+
+        function handleImagePreview(event, previewId, containerId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 16 * 1024 * 1024) {
+                showAlert('Ukuran file terlalu besar! Maksimal 16MB.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(previewId).src = e.target.result;
+                document.getElementById(containerId).classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showProgress(progressId) {
+            const progressBar = document.getElementById(progressId);
+            progressBar.classList.remove('hidden');
+            const fill = progressBar.querySelector('.progress-fill');
+            
+            let width = 0;
+            const interval = setInterval(() => {
+                width += Math.random() * 15 + 5;
+                if (width >= 90) {
+                    clearInterval(interval);
+                    fill.style.width = '90%';
+                } else {
+                    fill.style.width = width + '%';
+                }
+            }, 200);
+            
+            return () => {
+                fill.style.width = '100%';
+                setTimeout(() => progressBar.classList.add('hidden'), 1000);
+            };
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const resultSection = document.getElementById('resultSection');
+            resultSection.innerHTML = '';
+            resultSection.appendChild(alertDiv);
+            resultSection.classList.remove('hidden');
+            
+            setTimeout(() => {
+                resultSection.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Encode form submission
+        document.getElementById('encodeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const completeProgress = showProgress('encodeProgress');
+            
+            // Disable button and show loading
+            const encodeBtn = document.getElementById('encodeBtn');
+            const originalText = encodeBtn.innerHTML;
+            encodeBtn.innerHTML = '<div class="loading"></div> Memproses...';
+            encodeBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/encode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    completeProgress();
+                    showEncodeResult(result);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                completeProgress();
+                showAlert('Gagal menyembunyikan pesan: ' + error.message, 'error');
+            } finally {
+                encodeBtn.innerHTML = originalText;
+                encodeBtn.disabled = false;
+            }
+        });
+
+        // Decode form submission
+        document.getElementById('decodeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const completeProgress = showProgress('decodeProgress');
+            
+            // Disable button and show loading
+            const decodeBtn = document.getElementById('decodeBtn');
+            const originalText = decodeBtn.innerHTML;
+            decodeBtn.innerHTML = '<div class="loading"></div> Memproses...';
+            decodeBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/decode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    completeProgress();
+                    showDecodeResult(result);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                completeProgress();
+                showAlert('Gagal mengekstrak pesan: ' + error.message, 'error');
+            } finally {
+                decodeBtn.innerHTML = originalText;
+                decodeBtn.disabled = false;
+            }
+        });
+
+        function showEncodeResult(result) {
+            const resultSection = document.getElementById('resultSection');
+            resultSection.className = 'result-section result-success';
+            
+            const statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${result.stats.spread_factor}</div>
+                        <div class="stat-label">Spread Factor</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${result.stats.message_length}</div>
+                        <div class="stat-label">Panjang Pesan</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${result.stats.has_password ? 'Ya' : 'Tidak'}</div>
+                        <div class="stat-label">Password</div>
+                    </div>
+                </div>
+            `;
+            
+            resultSection.innerHTML = `
+                <h3>✅ Pesan Berhasil Disembunyikan!</h3>
+                <div class="alert alert-success">
+                    Pesan telah berhasil disembunyikan dalam gambar menggunakan algoritma Spread Spectrum Python.
+                </div>
+                ${statsHtml}
+                <div class="preview-container">
+                    <div class="preview-box">
+                        <h4>Gambar Asli</h4>
+                        <img src="${document.getElementById('originalImage').src}" alt="Original">
+                    </div>
+                    <div class="preview-box">
+                        <h4>Hasil Steganografi</h4>
+                        <img src="${result.image_data}" alt="Steganografi" id="resultImage">
+                    </div>
+                </div>
+                <button class="btn btn-download" onclick="downloadImage('${result.image_data}')">
+                    <span>💾</span> Download Gambar Steganografi
+                </button>
+            `;
+            
+            resultSection.classList.remove('hidden');
+        }
+
+        function showDecodeResult(result) {
+            const resultSection = document.getElementById('resultSection');
+            
+            if (result.stats.message_found && result.message !== "No hidden message found") {
+                resultSection.className = 'result-section result-success';
+                
+                const statsHtml = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${result.stats.spread_factor}</div>
+                            <div class="stat-label">Spread Factor</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${result.message.length}</div>
+                            <div class="stat-label">Panjang Pesan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${result.stats.has_password ? 'Ya' : 'Tidak'}</div>
+                            <div class="stat-label">Password</div>
+                        </div>
+                    </div>
+                `;
+                
+                resultSection.innerHTML = `
+                    <h3>✅ Pesan Berhasil Diekstrak!</h3>
+                    <div class="alert alert-success">
+                        Pesan rahasia berhasil diekstrak menggunakan algoritma Spread Spectrum Python.
+                    </div>
+                    ${statsHtml}
+                    <div class="message-display">
+                        <h4>🔓 Pesan Rahasia:</h4>
+                        <p><strong>"${result.message}"</strong></p>
+                    </div>
+                    <button class="btn btn-success" onclick="copyToClipboard('${result.message}')">
+                        <span>📋</span> Copy Pesan
+                    </button>
+                `;
+            } else {
+                resultSection.className = 'result-section result-error';
+                resultSection.innerHTML = `
+                    <h3>❌ Tidak Ada Pesan Ditemukan</h3>
+                    <div class="alert alert-error">
+                        Tidak ditemukan pesan tersembunyi dalam gambar ini, atau parameter dekripsi salah.
+                    </div>
+                    <p><strong>Kemungkinan penyebab:</strong></p>
+                    <ul style="text-align: left; margin: 20px auto; max-width: 400px;">
+                        <li>Gambar tidak mengandung pesan tersembunyi</li>
+                        <li>Password yang dimasukkan salah</li>
+                        <li>Spread factor tidak sesuai</li>
+                        <li>Gambar telah terkompresi atau dimodifikasi</li>
+                    </ul>
+                `;
+            }
+            
+            resultSection.classList.remove('hidden');
+        }
+
+        function downloadImage(imageData) {
+            const link = document.createElement('a');
+            link.download = 'steganografi_result.png';
+            link.href = imageData;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Gambar berhasil didownload!', 'success');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showAlert('Pesan berhasil dicopy ke clipboard!', 'success');
+            }, function(err) {
+                showAlert('Gagal copy pesan: ' + err, 'error');
+            });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔐 Aplikasi Steganografi Python siap digunakan!');
+            console.log('🐍 Backend: Python Flask + NumPy + PIL');
+            console.log('📡 Algoritma: Spread Spectrum Steganography');
+        });
+    </script>
+</body>
+</html>('dragover', function(e) {
+                e.preventDefault();
+                uploadElement.classList.add('dragover');
+            });
+
+            uploadElement.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadElement.classList.remove('dragover');
+            });
+
+            uploadElement.addEventListener
